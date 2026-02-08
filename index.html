@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>商品上架与购买站点</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <h1>商品上架与购买站点</h1>
+        <p>编辑并上架商品，公开展示给买家购买。</p>
+      </div>
+      <div class="wallet-card">
+        <span>BNB 链收款地址 (USDC)</span>
+        <code id="walletAddress">0xeB595173c6199905AcE3ECE801207ab743C7b76f</code>
+        <button id="copyWallet" class="ghost">复制地址</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel" aria-labelledby="admin-title">
+        <div class="panel-header">
+          <h2 id="admin-title">商品上架管理</h2>
+          <p>添加商品后，点击“上架”即可展示给买家。</p>
+        </div>
+
+        <form id="productForm" class="product-form">
+          <label>
+            商品名称
+            <input type="text" name="name" placeholder="例如：精品咖啡豆" required />
+          </label>
+          <label>
+            价格 (USDC)
+            <input type="number" name="price" min="0" step="0.01" placeholder="例如：12.99" required />
+          </label>
+          <label>
+            库存
+            <input type="number" name="stock" min="0" step="1" placeholder="例如：50" required />
+          </label>
+          <label>
+            商品图片 URL
+            <input type="url" name="image" placeholder="https://..." />
+          </label>
+          <label class="full-width">
+            商品描述
+            <textarea name="description" rows="3" placeholder="简单描述商品亮点"></textarea>
+          </label>
+          <div class="form-actions full-width">
+            <button type="submit" id="formSubmit" class="primary">添加商品</button>
+            <button type="button" id="formCancel" class="ghost" hidden>取消编辑</button>
+          </div>
+        </form>
+
+        <div class="inventory" aria-live="polite">
+          <h3>待上架商品</h3>
+          <div id="inventoryList" class="inventory-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="store-title">
+        <div class="panel-header">
+          <h2 id="store-title">公开购买页</h2>
+          <p>买家将看到已上架商品，并使用你的 USDC 地址完成支付。</p>
+        </div>
+        <div id="storefront" class="storefront"></div>
+      </section>
+    </main>
+
+    <template id="inventoryItemTemplate">
+      <article class="inventory-item">
+        <div>
+          <h4 class="item-name"></h4>
+          <p class="item-meta"></p>
+          <p class="item-desc"></p>
+        </div>
+        <div class="item-actions">
+          <button class="toggle">上架</button>
+          <button class="edit ghost">编辑</button>
+          <button class="remove ghost">删除</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="productCardTemplate">
+      <article class="product-card">
+        <img class="product-image" alt="" />
+        <div class="product-body">
+          <h3 class="product-name"></h3>
+          <p class="product-desc"></p>
+          <div class="product-footer">
+            <span class="price"></span>
+            <div class="product-actions">
+              <span class="stock"></span>
+              <button class="primary buy">购买</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <div id="purchaseModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <h3 id="modal-title">完成支付</h3>
+        <p>
+          请使用 USDC 转账至以下 BNB 链地址，并在留言中备注商品名称。
+        </p>
+        <code id="modalWallet"></code>
+        <p id="modalProduct"></p>
+        <button id="closeModal" class="ghost">关闭</button>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
