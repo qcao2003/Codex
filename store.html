@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>公开购买页</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <h1>公开购买页</h1>
+        <p>浏览已上架商品，并使用 USDC 完成支付。</p>
+        <a class="ghost" href="admin.html">前往管理后台</a>
+      </div>
+      <div class="wallet-card">
+        <span>BNB 链收款地址 (USDC)</span>
+        <code id="walletAddress">0xeB595173c6199905AcE3ECE801207ab743C7b76f</code>
+        <div class="wallet-actions">
+          <img id="walletQr" class="qr" alt="USDC 收款二维码" />
+          <button id="copyWallet" class="ghost">复制地址</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel" aria-labelledby="store-title">
+        <div class="panel-header">
+          <h2 id="store-title">商品列表</h2>
+          <p>已上架商品将展示在此，点击购买查看支付指引。</p>
+        </div>
+        <div id="storefront" class="storefront"></div>
+      </section>
+    </main>
+
+    <template id="productCardTemplate">
+      <article class="product-card">
+        <img class="product-image" alt="" />
+        <div class="product-body">
+          <h3 class="product-name"></h3>
+          <p class="product-desc"></p>
+          <div class="product-footer">
+            <span class="price"></span>
+            <div class="product-actions">
+              <span class="stock"></span>
+              <button class="primary buy">购买</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <div id="purchaseModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <h3 id="modal-title">完成支付</h3>
+        <p>
+          请使用 USDC 转账至以下 BNB 链地址，并在留言中备注商品名称。
+        </p>
+        <code id="modalWallet"></code>
+        <img id="modalQr" class="qr" alt="USDC 收款二维码" />
+        <p id="modalProduct"></p>
+        <button id="closeModal" class="ghost">关闭</button>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

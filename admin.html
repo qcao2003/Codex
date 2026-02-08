@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>商品上架管理后台</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <h1>商品上架管理后台</h1>
+        <p>登录后可编辑、上架商品。</p>
+        <a class="ghost" href="store.html">前往公开购买页</a>
+      </div>
+      <div class="wallet-card">
+        <span>BNB 链收款地址 (USDC)</span>
+        <code id="walletAddress">0xeB595173c6199905AcE3ECE801207ab743C7b76f</code>
+        <div class="wallet-actions">
+          <img id="walletQr" class="qr" alt="USDC 收款二维码" />
+          <button id="copyWallet" class="ghost">复制地址</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel" aria-labelledby="admin-title">
+        <div class="panel-header">
+          <h2 id="admin-title">商品上架管理</h2>
+          <p>添加商品后，点击“上架”即可展示给买家。</p>
+        </div>
+
+        <form id="productForm" class="product-form">
+          <label>
+            商品名称
+            <input type="text" name="name" placeholder="例如：精品咖啡豆" required />
+          </label>
+          <label>
+            价格 (USDC)
+            <input type="number" name="price" min="0" step="0.01" placeholder="例如：12.99" required />
+          </label>
+          <label>
+            库存
+            <input type="number" name="stock" min="0" step="1" placeholder="例如：50" required />
+          </label>
+          <label>
+            商品图片 URL
+            <input type="url" name="image" placeholder="https://..." />
+          </label>
+          <label class="full-width">
+            商品描述
+            <textarea name="description" rows="3" placeholder="简单描述商品亮点"></textarea>
+          </label>
+          <div class="form-actions full-width">
+            <button type="submit" id="formSubmit" class="primary">添加商品</button>
+            <button type="button" id="formCancel" class="ghost" hidden>取消编辑</button>
+          </div>
+        </form>
+
+        <div class="inventory" aria-live="polite">
+          <h3>待上架商品</h3>
+          <div id="inventoryList" class="inventory-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <template id="inventoryItemTemplate">
+      <article class="inventory-item">
+        <div>
+          <h4 class="item-name"></h4>
+          <p class="item-meta"></p>
+          <p class="item-desc"></p>
+        </div>
+        <div class="item-actions">
+          <button class="toggle">上架</button>
+          <button class="edit ghost">编辑</button>
+          <button class="remove ghost">删除</button>
+        </div>
+      </article>
+    </template>
+
+    <div id="adminLogin" class="modal" aria-hidden="true" role="dialog" aria-labelledby="login-title">
+      <div class="modal-content">
+        <h3 id="login-title">管理员登录</h3>
+        <p>请输入管理员密码进入后台。</p>
+        <form id="loginForm" class="product-form">
+          <label class="full-width">
+            密码
+            <input type="password" name="password" placeholder="请输入密码" required />
+          </label>
+          <button type="submit" class="primary">登录</button>
+        </form>
+        <p class="item-desc">默认密码：admin123（可在 app.js 修改）。</p>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
