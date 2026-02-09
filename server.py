@@ -29,10 +29,25 @@ def init_db() -> None:
                 stock INTEGER NOT NULL,
                 image TEXT,
                 description TEXT,
-                published INTEGER NOT NULL DEFAULT 0
+                published INTEGER NOT NULL DEFAULT 0,
+                sales INTEGER NOT NULL DEFAULT 0
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS purchases (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_id INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(product_id) REFERENCES products(id)
+            )
+            """
+        )
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(products)")}
+        if "sales" not in columns:
+            conn.execute("ALTER TABLE products ADD COLUMN sales INTEGER NOT NULL DEFAULT 0")
         conn.commit()
 
 
@@ -45,6 +60,7 @@ def row_to_dict(row: sqlite3.Row) -> dict[str, Any]:
         "image": row["image"],
         "description": row["description"],
         "published": bool(row["published"]),
+        "sales": row["sales"],
     }
 
 
@@ -126,6 +142,34 @@ def delete_product(product_id: int) -> Any:
         conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
         conn.commit()
     return jsonify({"status": "deleted"})
+
+
+@app.route("/api/purchases", methods=["POST"])
+def create_purchase() -> Any:
+    data = request.get_json(force=True)
+    product_id = data.get("product_id")
+    quantity = int(data.get("quantity", 1))
+    if not product_id or quantity <= 0:
+        return jsonify({"error": "invalid purchase"}), 400
+
+    with get_db_connection() as conn:
+        product = conn.execute("SELECT * FROM products WHERE id = ?", (product_id,)).fetchone()
+        if not product:
+            return jsonify({"error": "product not found"}), 404
+        if product["stock"] < quantity:
+            return jsonify({"error": "out of stock"}), 400
+
+        conn.execute(
+            "INSERT INTO purchases (product_id, quantity) VALUES (?, ?)",
+            (product_id, quantity),
+        )
+        conn.execute(
+            "UPDATE products SET stock = stock - ?, sales = sales + ? WHERE id = ?",
+            (quantity, quantity, product_id),
+        )
+        conn.commit()
+        updated = conn.execute("SELECT * FROM products WHERE id = ?", (product_id,)).fetchone()
+    return jsonify(row_to_dict(updated)), 201
 
 
 if __name__ == "__main__":

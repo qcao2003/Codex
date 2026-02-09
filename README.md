@@ -16,6 +16,7 @@
 - 公开购买页展示已上架商品
 - 复制 BNB 链 USDC 收款地址并展示二维码
 - 后端 API + SQLite 数据库存储商品信息（支持增删改查）
+- 购买行为写入数据库并累计已售数量
 
 ## 运行
 
@@ -41,5 +42,6 @@ python server.py
 - 新增商品：`POST /api/products`
 - 更新商品：`PUT /api/products/<id>`
 - 删除商品：`DELETE /api/products/<id>`
+- 购买商品：`POST /api/purchases`
 
 > 商品数据保存在 `products.db` 中。管理后台默认密码为 `admin123`，可在 `app.js` 中修改。

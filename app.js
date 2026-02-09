@@ -23,6 +23,7 @@ let editingId = null;
 
 const formatPrice = (price) => `${Number(price).toFixed(2)} USDC`;
 const formatStock = (stock) => `库存 ${Number(stock)}`;
+const formatSales = (sales) => `已售 ${Number(sales || 0)}`;
 
 const qrUrl = (text) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
@@ -58,6 +59,12 @@ const updateProduct = (id, payload) =>
 const deleteProduct = (id) =>
   requestJson(`/api/products/${id}`, {
     method: "DELETE",
+  });
+
+const createPurchase = (payload) =>
+  requestJson("/api/purchases", {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 
 const setFormMode = ({ isEditing, product }) => {
@@ -99,7 +106,7 @@ const renderInventory = (products) => {
     const remove = node.querySelector(".remove");
 
     name.textContent = product.name;
-    meta.textContent = `${formatPrice(product.price)} · ${formatStock(product.stock)}`;
+    meta.textContent = `${formatPrice(product.price)} · ${formatStock(product.stock)} · ${formatSales(product.sales)}`;
     desc.textContent = product.description || "暂无描述";
 
     toggle.textContent = product.published ? "下架" : "上架";
@@ -142,7 +149,7 @@ const renderStorefront = (products) => {
     stock.textContent = formatStock(product.stock);
 
     buy.disabled = Number(product.stock) <= 0;
-    buy.addEventListener("click", () => openModal(product));
+    buy.addEventListener("click", () => handlePurchase(product));
     card.dataset.id = product.id;
     storefront.appendChild(node);
   });
@@ -232,12 +239,25 @@ const removeProduct = async (id) => {
   }
 };
 
+const handlePurchase = async (product) => {
+  try {
+    const updated = await createPurchase({
+      product_id: product.id,
+      quantity: 1,
+    });
+    await refreshUI();
+    openModal({ ...product, stock: updated.stock });
+  } catch (error) {
+    alert(error.message || "购买失败，请稍后再试。");
+  }
+};
+
 const openModal = (product) => {
   if (!modal) return;
   modalWallet.textContent = walletAddress;
   modalProduct.textContent = `商品：${product.name} · 支付金额：${formatPrice(product.price)}`;
   if (modalQr) {
-    modalQr.src = qrUrl(walletAddress);
+    modalQr.src = qrUrl(`usdc:${walletAddress}?amount=${product.price}`);
   }
   modal.setAttribute("aria-hidden", "false");
 };
